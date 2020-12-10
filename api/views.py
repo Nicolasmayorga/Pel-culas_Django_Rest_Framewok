@@ -1,8 +1,42 @@
-from .models import Pelicula
-from .serializers import PeliculaSerializer
-from rest_framework import viewsets
+from .models import Pelicula, PeliculaFavorita
+from .serializers import PeliculaSerializer, PeliculaFavoritaSerializer
+
+from django.shortcuts import get_object_or_404
+
+from rest_framework import viewsets, views
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 
 class PeliculaViewSet(viewsets.ModelViewSet):
     queryset = Pelicula.objects.all()
     serializer_class = PeliculaSerializer
+
+
+class MarcarPeliculaFavorita(views.APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        pelicula = get_object_or_404(
+            Pelicula, id=self.request.data.get('id', 0)
+        )
+
+        favorita, created = PeliculaFavorita.objects.get_or_create(
+            pelicula=pelicula, usuario=request.user
+        )
+
+    
+        content = {
+            'id': pelicula.id,
+            'favorita': True
+        }
+
+    
+        if not created:
+            favorita.delete()
+            content['favorita'] = False
+
+        return Response(content)
