@@ -3,7 +3,7 @@ from .serializers import PeliculaSerializer, PeliculaFavoritaSerializer
 
 from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, views
+from rest_framework import viewsets, views, filters
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,6 +12,10 @@ from rest_framework.response import Response
 class PeliculaViewSet(viewsets.ModelViewSet):
     queryset = Pelicula.objects.all()
     serializer_class = PeliculaSerializer
+    
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['titulo']
+    ordering_fields = ['favoritos']
 
 
 class MarcarPeliculaFavorita(views.APIView):
