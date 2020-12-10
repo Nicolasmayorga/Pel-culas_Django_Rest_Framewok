@@ -28,15 +28,29 @@ class MarcarPeliculaFavorita(views.APIView):
             pelicula=pelicula, usuario=request.user
         )
 
-    
         content = {
             'id': pelicula.id,
             'favorita': True
         }
 
-    
         if not created:
             favorita.delete()
             content['favorita'] = False
 
         return Response(content)
+
+
+class ListarPeliculasFavoritas(views.APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    
+
+    def get(self, request):
+
+        peliculas_favoritas = PeliculaFavorita.objects.filter(
+            usuario=request.user)
+        serializer = PeliculaFavoritaSerializer(
+            peliculas_favoritas, many=True)
+
+        return Response(serializer.data)
