@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
@@ -13,3 +14,6 @@ class Pelicula(models.Model):
         ordering = ['titulo']
 
 
+class PeliculaFavorita(models.Model):
+    pelicula = models.ForeignKey(Pelicula, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
